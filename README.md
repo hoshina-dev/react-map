@@ -1,6 +1,9 @@
 # @hoshina/react-map
 
-Reusable map components for MapFox applications.
+[![](https://img.shields.io/npm/v/@hoshina/react-map.svg?maxAge=3600)](https://www.npmjs.com/package/@hoshina/react-map)
+[![](https://img.shields.io/npm/dt/@hoshina/react-map.svg?maxAge=3600)](https://www.npmjs.com/package/@hoshina/react-map)
+
+Reusable map components within Hoshina Dev's applications.
 
 ## Features
 
