@@ -1,4 +1,4 @@
-# @repo/map
+# @hoshina/react-map
 
 Reusable map components for MapFox applications.
 
@@ -22,8 +22,8 @@ src/
 
 ### 1. Implement a Data Adapter
 
-```typescript
-import type { GeoDataLoader } from "@repo/map";
+```ts
+import type { GeoDataLoader } from "@hoshina/react-map";
 
 class MyDataLoader implements GeoDataLoader {
   async loadWorldMap() {
@@ -40,20 +40,20 @@ class MyDataLoader implements GeoDataLoader {
 
 ### 2. Use the Components
 
-```typescript
-import { SiteMap, createLevelConfig } from '@repo/map';
+```tsx
+import { SiteMap, createLevelConfig } from "@hoshina/react-map";
 
 const dataLoader = new MyDataLoader();
 
 const levelConfigs = {
   0: createLevelConfig({
-    layerId: 'world-countries',
-    variant: 'country',
+    layerId: "world-countries",
+    variant: "country",
     dataLoader,
   }),
 };
 
-<SiteMap levelConfigs={levelConfigs} maxLevel={1} />
+<SiteMap levelConfigs={levelConfigs} maxLevel={1} />;
 ```
 
 ## Components
