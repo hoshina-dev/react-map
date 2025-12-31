@@ -22,11 +22,12 @@
     "build": "tsdown",
     "dev": "tsdown --watch",
     "prepublishOnly": "pnpm run build",
-    "lint": "eslint --max-warnings 0",
+    "lint": "eslint",
+    "lint-strict": "eslint --max-warnings=0",
     "format": "eslint --fix",
     "check-types": "tsc --noEmit"
   },
-  "sideEffects": false,
+  "sideEffects": true,
   "dependencies": {
     "@math.gl/web-mercator": "^4.1.0"
   },
