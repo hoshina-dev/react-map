@@ -49,4 +49,4 @@ jobs:
 
       - name: Publish Package
         run: |
-          pnpm publish
+          pnpm publish --no-git-checks
