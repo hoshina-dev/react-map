@@ -1,18 +1,14 @@
 {
   "name": "@hoshina/react-map",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "publishConfig": {
     "access": "public"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.cts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
-    },
+    ".": "./dist/index.js",
     "./package.json": "./package.json"
   },
   "files": [
