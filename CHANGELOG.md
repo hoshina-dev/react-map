@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.0] - 2025-01-07
+
+- feat: support level 2
+
 ## [0.2.0] - 2025-01-06
 
 - unbundle for better RSC support

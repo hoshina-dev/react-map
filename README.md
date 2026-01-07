@@ -30,13 +30,18 @@ import type { GeoDataLoader } from "@hoshina/react-map";
 
 class MyDataLoader implements GeoDataLoader {
   async loadWorldMap() {
-    // Fetch from your API
+    // Fetch from your API (Level 0 - countries)
     return geoJSONData;
   }
 
   async loadAdminBoundaries(parentCode: string) {
-    // Fetch child regions
+    // Fetch child regions (Level 1 - states/provinces)
     return childGeoJSON;
+  }
+
+  async loadSubAdminBoundaries(parentCode: string) {
+    // Fetch sub-regions (Level 2 - counties/districts) - Optional
+    return subRegionGeoJSON;
   }
 }
 ```
@@ -44,9 +49,20 @@ class MyDataLoader implements GeoDataLoader {
 ### 2. Use the Components
 
 ```tsx
-import { SiteMap, createLevelConfig } from "@hoshina/react-map";
+import { SiteMap, createStandardLevelConfigs } from "@hoshina/react-map";
 
 const dataLoader = new MyDataLoader();
+
+// Standard config for 2-level drill-down (World → Country → Region)
+const levelConfigs = createStandardLevelConfigs(dataLoader, 2);
+
+<SiteMap levelConfigs={levelConfigs} maxLevel={2} />;
+```
+
+Or create custom level configurations:
+
+```tsx
+import { SiteMap, createLevelConfig } from "@hoshina/react-map";
 
 const levelConfigs = {
   0: createLevelConfig({
@@ -54,10 +70,34 @@ const levelConfigs = {
     variant: "country",
     dataLoader,
   }),
+  1: createLevelConfig({
+    layerId: "admin-boundaries-1",
+    variant: "default",
+    dataLoader,
+  }),
+  2: createLevelConfig({
+    layerId: "admin-boundaries-2",
+    variant: "default",
+    dataLoader,
+  }),
 };
 
-<SiteMap levelConfigs={levelConfigs} maxLevel={1} />;
+<SiteMap levelConfigs={levelConfigs} maxLevel={2} />;
 ```
+
+## Map Levels
+
+The library supports multiple drill-down levels:
+
+- **Level 0**: World map (countries)
+- **Level 1**: Admin boundaries (states/provinces)
+- **Level 2**: Sub-admin boundaries (counties/districts)
+
+Set `maxLevel` to control the maximum drill-down depth. The `GeoDataLoader` interface supports:
+
+- `loadWorldMap()` - Required for level 0
+- `loadAdminBoundaries()` - Required for level 1
+- `loadSubAdminBoundaries()` - Optional for level 2
 
 ## Components
 

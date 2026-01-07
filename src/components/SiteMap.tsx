@@ -229,10 +229,26 @@ export const SiteMap = forwardRef<SiteMapHandle, SiteMapProps>(function SiteMap(
       setIsTransitioning(true);
       setIsLoading(true);
       try {
-        // Load data for the next level using isoCode
-        const data = await nextConfig.dataLoader.loadAdminBoundaries(
-          isoCode ?? name,
-        );
+        // Load data for the next level using appropriate loader method
+        let data: GeoJSONFeatureCollection | null = null;
+
+        if (nextLevel === 1) {
+          data = await nextConfig.dataLoader.loadAdminBoundaries(
+            isoCode ?? name,
+          );
+        } else if (
+          nextLevel === 2 &&
+          nextConfig.dataLoader.loadSubAdminBoundaries
+        ) {
+          data = await nextConfig.dataLoader.loadSubAdminBoundaries(
+            isoCode ?? name,
+          );
+        } else if (nextLevel > 2) {
+          // For levels beyond 2, fall back to loadAdminBoundaries if available
+          data = await nextConfig.dataLoader.loadAdminBoundaries(
+            isoCode ?? name,
+          );
+        }
 
         if (data && data.features.length > 0) {
           // Update layer data
@@ -250,11 +266,27 @@ export const SiteMap = forwardRef<SiteMapHandle, SiteMapProps>(function SiteMap(
           fitToBounds(data);
           setTimeout(() => setIsTransitioning(false), 300);
         } else {
-          setIsTransitioning(false);
+          // No data available for next level, treat as selection instead
+          setSelectedFeature(name);
+          zoomToFeature(name);
+          onFeatureSelect?.({
+            name,
+            isoCode,
+            level: focusLevel,
+          });
+          setTimeout(() => setIsTransitioning(false), 500);
         }
       } catch (error) {
         console.error(`Failed to load level ${nextLevel} data:`, error);
-        setIsTransitioning(false);
+        // On error, treat as selection
+        setSelectedFeature(name);
+        zoomToFeature(name);
+        onFeatureSelect?.({
+          name,
+          isoCode,
+          level: focusLevel,
+        });
+        setTimeout(() => setIsTransitioning(false), 500);
       } finally {
         setIsLoading(false);
       }

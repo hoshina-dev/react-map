@@ -16,6 +16,7 @@ interface MapInfoBarProps {
 const DEFAULT_LEVEL_NAMES: Record<number, string> = {
   0: "World",
   1: "Country",
+  2: "Region",
 };
 
 export function MapInfoBar({
