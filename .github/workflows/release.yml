@@ -45,8 +45,8 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Install Dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Publish Package
         run: |
-          pnpm publish --no-git-checks
+          pnpm --filter=@hoshina/react-map publish --no-git-checks
