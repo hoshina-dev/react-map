@@ -1,9 +1,9 @@
 "use client";
 
+import { Map } from "@hoshina/react-map";
 import { Flex } from "@mantine/core";
 import { useState } from "react";
 
-import { Map } from "@/components/Map";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import {
   clearAdminAreasCache,
