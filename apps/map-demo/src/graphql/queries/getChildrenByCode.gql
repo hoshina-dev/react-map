@@ -1,0 +1,18 @@
+query GetChildrenByCode(
+  $parentCode: String!
+  $childLevel: Int!
+  $tolerance: Float
+) {
+  childrenByCode(
+    parentCode: $parentCode
+    childLevel: $childLevel
+    tolerance: $tolerance
+  ) {
+    id
+    name
+    isoCode
+    geometry
+    adminLevel
+    parentCode
+  }
+}

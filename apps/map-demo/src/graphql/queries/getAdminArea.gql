@@ -1,0 +1,10 @@
+query GetAdminArea($id: ID!, $adminLevel: Int!, $tolerance: Float) {
+  adminArea(id: $id, adminLevel: $adminLevel, tolerance: $tolerance) {
+    id
+    name
+    isoCode
+    geometry
+    adminLevel
+    parentCode
+  }
+}
