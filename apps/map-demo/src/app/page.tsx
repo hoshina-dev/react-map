@@ -10,7 +10,7 @@ import {
   useAdminAreas,
   useChildrenByCode,
 } from "@/hooks/useAdminAreas";
-import { ToleranceSettings } from "@/types/admin-areas";
+import { LEVEL_STYLES, ToleranceSettings } from "@/types/admin-areas";
 
 export default function Home() {
   const [tolerance, setTolerance] = useState<ToleranceSettings>({
@@ -24,7 +24,7 @@ export default function Home() {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [selectedAreaName, setSelectedAreaName] = useState<string | null>(null);
-  const [forceRefresh, setForceRefresh] = useState(0);
+  const [_, setForceRefresh] = useState(0);
 
   // Fetch countries (level 0) initially
   const {
@@ -52,7 +52,7 @@ export default function Home() {
   const handleCountryClick = (
     areaCode: string,
     areaName: string,
-    _geometry: any,
+    _geometry: unknown,
   ) => {
     setSelectedArea(areaCode);
     setSelectedAreaName(areaName);
@@ -86,10 +86,10 @@ export default function Home() {
   return (
     <Flex style={{ width: "100vw", height: "100vh" }}>
       <Map
-        countriesData={countriesData}
-        childrenData={childrenData}
+        currentData={currentLevel === 0 ? countriesData : childrenData}
         currentLevel={currentLevel}
-        onCountryClick={handleCountryClick}
+        levelStyle={LEVEL_STYLES[currentLevel] || LEVEL_STYLES[0]}
+        onGeometryClick={handleCountryClick}
         onZoomOut={handleZoomOut}
       />
 

@@ -1,5 +1,6 @@
 "use client";
 
+import type { MapLevelStyle } from "@hoshina/react-map";
 import {
   Badge,
   Box,
@@ -17,13 +18,11 @@ import maplibregl from "maplibre-gl";
 import { useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 
-import { LEVEL_STYLES } from "@/types/admin-areas";
-
 interface MapProps {
-  countriesData: GeoJsonFeatureCollection | null;
-  childrenData: GeoJsonFeatureCollection | null;
   currentLevel: number;
-  onCountryClick: (
+  currentData: GeoJsonFeatureCollection | null;
+  levelStyle: MapLevelStyle;
+  onGeometryClick: (
     areaCode: string,
     areaName: string,
     geometry: Geometry,
@@ -32,10 +31,10 @@ interface MapProps {
 }
 
 export function Map({
-  countriesData,
-  childrenData,
   currentLevel,
-  onCountryClick,
+  currentData,
+  levelStyle,
+  onGeometryClick,
   onZoomOut,
 }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -117,8 +116,6 @@ export function Map({
   useEffect(() => {
     if (!map.current) return;
 
-    const currentData = currentLevel === 0 ? countriesData : childrenData;
-
     if (!currentData || currentData.features.length === 0) {
       return;
     }
@@ -126,9 +123,6 @@ export function Map({
     const sourceId = "admin-boundaries";
     const fillLayerId = "admin-fill";
     const outlineLayerId = "admin-outline";
-    const currentStyle = LEVEL_STYLES[currentLevel] || LEVEL_STYLES[0];
-
-    if (!currentStyle) return;
 
     // Remove existing layers and source
     if (map.current.getLayer(fillLayerId)) {
@@ -153,7 +147,7 @@ export function Map({
       type: "fill",
       source: sourceId,
       paint: {
-        "fill-color": currentStyle.fillColor,
+        "fill-color": levelStyle.fillColor,
         "fill-opacity": [
           "case",
           ["boolean", ["feature-state", "hover"], false],
@@ -169,8 +163,8 @@ export function Map({
       type: "line",
       source: sourceId,
       paint: {
-        "line-color": currentStyle.lineColor,
-        "line-width": currentStyle.lineWidth,
+        "line-color": levelStyle.lineColor,
+        "line-width": levelStyle.lineWidth,
       },
     });
 
@@ -212,7 +206,13 @@ export function Map({
       }
       hoveredFeatureId = undefined;
     });
-  }, [countriesData, childrenData, currentLevel]);
+  }, [
+    currentData,
+    currentLevel,
+    levelStyle.fillColor,
+    levelStyle.lineColor,
+    levelStyle.lineWidth,
+  ]);
 
   // Handle click to drill down
   useEffect(() => {
@@ -231,7 +231,7 @@ export function Map({
         const areaCode = properties?.isoCode || properties?.id;
         const areaName = properties?.name || areaCode;
 
-        onCountryClick(areaCode, areaName, geometry);
+        onGeometryClick(areaCode, areaName, geometry);
 
         // Zoom to clicked feature
         if (geometry && map.current) {
@@ -268,7 +268,7 @@ export function Map({
     return () => {
       map.current?.off("click", fillLayerId, handleClick);
     };
-  }, [currentLevel, onCountryClick]);
+  }, [currentLevel, onGeometryClick]);
 
   // Handle right-click to zoom out
   useEffect(() => {

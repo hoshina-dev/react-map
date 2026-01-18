@@ -10,6 +10,7 @@ interface GeoJSONFeature {
     adminLevel: number;
     parentCode?: string | null;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   geometry: any;
 }
 

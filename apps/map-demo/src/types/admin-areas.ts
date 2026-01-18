@@ -52,4 +52,4 @@ export const LEVEL_STYLES = [
   { fillColor: "#f39c12", lineColor: "#e67e22", lineWidth: 1.5 },
   { fillColor: "#e74c3c", lineColor: "#c0392b", lineWidth: 1 },
   { fillColor: "#9b59b6", lineColor: "#8e44ad", lineWidth: 1 },
-];
+] as const;

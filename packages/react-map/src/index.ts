@@ -1,8 +1,8 @@
 // Core types and utilities
-export * from "./core";
+export * from "./types";
 
 // Adapter interfaces
-export * from "./adapters";
+// export * from "./adapters";
 
 // React components
 export * from "./components";
