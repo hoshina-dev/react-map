@@ -1,5 +1,7 @@
 "use client";
 
+import "maplibre-gl/dist/maplibre-gl.css";
+
 import { Box } from "@mantine/core";
 import maplibregl from "maplibre-gl";
 import { type ReactNode, useEffect, useRef, useState } from "react";
