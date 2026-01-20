@@ -27,10 +27,13 @@ export default function Home() {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [selectedAreaName, setSelectedAreaName] = useState<string | null>(null);
-  const [parentArea, setParentArea] = useState<string | null>(null); // Track the parent for data fetching
+  const [parentHierarchy, setParentHierarchy] = useState<string[]>([]); // Stack of parent area codes
   const [_, setForceRefresh] = useState(0);
   const [maxLevel, setMaxLevel] = useState(4);
   const [selectedForFinal, setSelectedForFinal] = useState(false);
+
+  // Get the current parent area from the hierarchy
+  const parentArea = parentHierarchy[currentLevel - 1] || null;
 
   // Fetch countries (level 0) initially
   const {
@@ -103,17 +106,21 @@ export default function Home() {
       setSelectedForFinal(false);
       setSelectedArea(areaCode);
       setSelectedAreaName(areaName);
-      setParentArea(areaCode); // Set as parent for next level
+      setParentHierarchy((prev) => [...prev, areaCode]); // Add to hierarchy stack
       setCurrentLevel((prev) => prev + 1);
     },
     [currentLevel, maxLevel, tolerance],
   );
 
   const handleZoomOut = useCallback(() => {
-    setCurrentLevel((prev) => prev - 1);
+    setCurrentLevel((prev) => {
+      const newLevel = prev - 1;
+      // Remove the last parent from hierarchy when zooming out
+      setParentHierarchy((hierarchy) => hierarchy.slice(0, newLevel));
+      return newLevel;
+    });
     setSelectedArea(null);
     setSelectedAreaName(null);
-    setParentArea(null);
     setSelectedForFinal(false);
   }, []);
 
