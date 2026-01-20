@@ -38,43 +38,41 @@ export function ClickHandler({
       const properties = feature.properties;
       const geometry = feature.geometry;
 
-      if (currentLevel < 4) {
-        const areaCode = properties?.isoCode || properties?.id;
-        const areaName = properties?.name || areaCode;
+      const areaCode = properties?.isoCode || properties?.id;
+      const areaName = properties?.name || areaCode;
 
-        onGeometryClick(areaCode, areaName, geometry);
+      onGeometryClick(areaCode, areaName, geometry);
 
-        // Zoom to clicked feature
-        if (geometry) {
-          const bounds = new maplibregl.LngLatBounds();
+      // Zoom to clicked feature
+      if (geometry) {
+        const bounds = new maplibregl.LngLatBounds();
 
-          if (geometry.type === "Polygon") {
-            const polygonGeometry = geometry as {
-              type: "Polygon";
-              coordinates: number[][][];
-            };
-            polygonGeometry.coordinates.forEach((ring) => {
+        if (geometry.type === "Polygon") {
+          const polygonGeometry = geometry as {
+            type: "Polygon";
+            coordinates: number[][][];
+          };
+          polygonGeometry.coordinates.forEach((ring) => {
+            ring.forEach((coord) => {
+              bounds.extend(coord as [number, number]);
+            });
+          });
+        } else if (geometry.type === "MultiPolygon") {
+          const multiPolygonGeometry = geometry as {
+            type: "MultiPolygon";
+            coordinates: number[][][][];
+          };
+          multiPolygonGeometry.coordinates.forEach((polygon) => {
+            polygon.forEach((ring) => {
               ring.forEach((coord) => {
                 bounds.extend(coord as [number, number]);
               });
             });
-          } else if (geometry.type === "MultiPolygon") {
-            const multiPolygonGeometry = geometry as {
-              type: "MultiPolygon";
-              coordinates: number[][][][];
-            };
-            multiPolygonGeometry.coordinates.forEach((polygon) => {
-              polygon.forEach((ring) => {
-                ring.forEach((coord) => {
-                  bounds.extend(coord as [number, number]);
-                });
-              });
-            });
-          }
+          });
+        }
 
-          if (!bounds.isEmpty()) {
-            map.fitBounds(bounds, { padding: 50, duration: 1000 });
-          }
+        if (!bounds.isEmpty()) {
+          map.fitBounds(bounds, { padding: 50, duration: 1000 });
         }
       }
     };

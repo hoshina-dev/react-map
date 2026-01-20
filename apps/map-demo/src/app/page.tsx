@@ -27,7 +27,10 @@ export default function Home() {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [selectedAreaName, setSelectedAreaName] = useState<string | null>(null);
+  const [parentArea, setParentArea] = useState<string | null>(null); // Track the parent for data fetching
   const [_, setForceRefresh] = useState(0);
+  const [maxLevel, setMaxLevel] = useState(4);
+  const [selectedForFinal, setSelectedForFinal] = useState(false);
 
   // Fetch countries (level 0) initially
   const {
@@ -46,25 +49,72 @@ export default function Home() {
     loading: childrenLoading,
     refetch: refetchChildren,
   } = useChildrenByCode({
-    parentCode: selectedArea,
+    parentCode: parentArea,
     childLevel: currentLevel,
     tolerance: tolerance[`level${currentLevel}` as keyof ToleranceSettings],
-    enabled: currentLevel > 0 && !!selectedArea,
+    enabled: currentLevel > 0 && !!parentArea,
   });
 
   const handleCountryClick = useCallback(
-    (areaCode: string, areaName: string, _geometry: unknown) => {
+    async (areaCode: string, areaName: string, _geometry: unknown) => {
+      // Check if we've reached max level
+      if (currentLevel >= maxLevel) {
+        setSelectedForFinal(true);
+        setSelectedArea(areaCode);
+        setSelectedAreaName(areaName);
+        // Don't change parentArea - keep showing current level
+        return;
+      }
+
+      // Check if next level has sufficient data
+      const nextLevel = currentLevel + 1;
+      const nextTolerance =
+        tolerance[`level${nextLevel}` as keyof ToleranceSettings];
+
+      try {
+        const response = await fetch(
+          `/api/admin-areas/children/${encodeURIComponent(areaCode)}?childLevel=${nextLevel}&tolerance=${nextTolerance}`,
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const featureCount = data?.features?.length || 0;
+
+          // If next level has 0 or 1 features, treat this as a final selection
+          if (featureCount <= 1) {
+            setSelectedForFinal(true);
+            setSelectedArea(areaCode);
+            setSelectedAreaName(areaName);
+            // Don't change parentArea - keep showing current level
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Error checking children:", error);
+        // On error, treat as final selection to be safe
+        setSelectedForFinal(true);
+        setSelectedArea(areaCode);
+        setSelectedAreaName(areaName);
+        // Don't change parentArea - keep showing current level
+        return;
+      }
+
+      // Normal drill down
+      setSelectedForFinal(false);
       setSelectedArea(areaCode);
       setSelectedAreaName(areaName);
+      setParentArea(areaCode); // Set as parent for next level
       setCurrentLevel((prev) => prev + 1);
     },
-    [],
+    [currentLevel, maxLevel, tolerance],
   );
 
   const handleZoomOut = useCallback(() => {
     setCurrentLevel((prev) => prev - 1);
     setSelectedArea(null);
     setSelectedAreaName(null);
+    setParentArea(null);
+    setSelectedForFinal(false);
   }, []);
 
   const handleRerender = () => {
@@ -92,7 +142,12 @@ export default function Home() {
     <Flex style={{ width: "100vw", height: "100vh" }}>
       <Map>
         <Marker />
-        <BoundaryLayer data={currentData} style={levelStyle} />
+        <BoundaryLayer
+          data={currentData}
+          style={levelStyle}
+          selectedAreaCode={selectedArea}
+          isSelectedForFinal={selectedForFinal}
+        />
         <ClickHandler
           currentLevel={currentLevel}
           onGeometryClick={handleCountryClick}
@@ -110,6 +165,9 @@ export default function Home() {
         selectedAreaName={selectedAreaName}
         loading={countriesLoading || childrenLoading}
         featuresLoaded={featuresLoaded}
+        maxLevel={maxLevel}
+        onMaxLevelChange={setMaxLevel}
+        selectedForFinal={selectedForFinal}
       />
     </Flex>
   );

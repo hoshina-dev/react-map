@@ -27,6 +27,9 @@ interface SettingsPanelProps {
   selectedAreaName: string | null;
   loading: boolean;
   featuresLoaded: number;
+  maxLevel: number;
+  onMaxLevelChange: (maxLevel: number) => void;
+  selectedForFinal: boolean;
 }
 
 export function SettingsPanel({
@@ -39,6 +42,9 @@ export function SettingsPanel({
   selectedAreaName,
   loading,
   featuresLoaded,
+  maxLevel,
+  onMaxLevelChange,
+  selectedForFinal,
 }: SettingsPanelProps) {
   return (
     <Paper
@@ -131,6 +137,14 @@ export function SettingsPanel({
                 {featuresLoaded}
               </Text>
             </Flex>
+            {selectedForFinal && (
+              <Flex justify="space-between">
+                <Text size="sm">Selection Status:</Text>
+                <Badge variant="filled" color="green">
+                  Area Selected
+                </Badge>
+              </Flex>
+            )}
           </Stack>
         </Paper>
 
@@ -148,6 +162,10 @@ export function SettingsPanel({
             </Text>
             <Text size="xs" c="dimmed">
               • Adjust tolerance values below to control geometry detail
+            </Text>
+            <Text size="xs" c="dimmed">
+              • When reaching max level or areas with no sub-divisions, clicking
+              will select the area (shown in green)
             </Text>
           </Stack>
         </Paper>
@@ -173,6 +191,34 @@ export function SettingsPanel({
                 </Text>
               </Flex>
             ))}
+          </Stack>
+        </Paper>
+
+        <Divider />
+
+        {/* Max Level Configuration */}
+        <Paper p="md" withBorder bg="orange.0">
+          <Stack gap="xs">
+            <Title order={5}>Max Drill-Down Level</Title>
+            <Text size="sm" c="dimmed">
+              Configure the maximum admin level you want to drill down to.
+              Clicking on areas at this level will select them instead of
+              drilling further.
+            </Text>
+            <NumberInput
+              label="Maximum Level"
+              description="Range: 0 (Countries) to 4 (Neighborhoods)"
+              value={maxLevel}
+              onChange={(value) =>
+                onMaxLevelChange(typeof value === "number" ? value : 4)
+              }
+              min={0}
+              max={4}
+              step={1}
+              allowDecimal={false}
+              allowNegative={false}
+              clampBehavior="strict"
+            />
           </Stack>
         </Paper>
 
