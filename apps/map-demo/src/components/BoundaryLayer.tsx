@@ -1,0 +1,140 @@
+"use client";
+
+import { MapLevelStyle, useMap } from "@hoshina/react-map";
+import type { FeatureCollection as GeoJsonFeatureCollection } from "geojson";
+import maplibregl from "maplibre-gl";
+import { useEffect, useRef } from "react";
+
+interface BoundaryLayerProps {
+  data: GeoJsonFeatureCollection | null;
+  style: MapLevelStyle;
+  layerId?: string;
+}
+
+export function BoundaryLayer({
+  data,
+  style,
+  layerId = "admin-boundaries",
+}: BoundaryLayerProps) {
+  const map = useMap();
+  const hoveredFeatureIdRef = useRef<string | number | undefined>(undefined);
+
+  useEffect(() => {
+    if (!map || !data || data.features.length === 0) {
+      return;
+    }
+
+    const sourceId = layerId;
+    const fillLayerId = `${layerId}-fill`;
+    const outlineLayerId = `${layerId}-outline`;
+
+    // Remove existing layers and source if they exist
+    if (map.getLayer(fillLayerId)) {
+      map.removeLayer(fillLayerId);
+    }
+    if (map.getLayer(outlineLayerId)) {
+      map.removeLayer(outlineLayerId);
+    }
+    if (map.getSource(sourceId)) {
+      map.removeSource(sourceId);
+    }
+
+    // Add new source
+    map.addSource(sourceId, {
+      type: "geojson",
+      data,
+    });
+
+    // Add fill layer
+    map.addLayer({
+      id: fillLayerId,
+      type: "fill",
+      source: sourceId,
+      paint: {
+        "fill-color": style.fillColor,
+        "fill-opacity": [
+          "case",
+          ["boolean", ["feature-state", "hover"], false],
+          0.7,
+          0.4,
+        ],
+      },
+    });
+
+    // Add outline layer
+    map.addLayer({
+      id: outlineLayerId,
+      type: "line",
+      source: sourceId,
+      paint: {
+        "line-color": style.lineColor,
+        "line-width": style.lineWidth,
+      },
+    });
+
+    // Event handlers
+    const onMouseEnter = () => {
+      map.getCanvas().style.cursor = "pointer";
+    };
+
+    const onMouseLeave = () => {
+      map.getCanvas().style.cursor = "";
+    };
+
+    const onMouseMove = (e: maplibregl.MapLayerMouseEvent) => {
+      if (e.features && e.features.length > 0) {
+        if (hoveredFeatureIdRef.current !== undefined) {
+          map.setFeatureState(
+            { source: sourceId, id: hoveredFeatureIdRef.current },
+            { hover: false },
+          );
+        }
+        const featureId = e.features[0]?.id;
+        if (featureId !== undefined) {
+          hoveredFeatureIdRef.current = featureId;
+          map.setFeatureState(
+            { source: sourceId, id: hoveredFeatureIdRef.current },
+            { hover: true },
+          );
+        }
+      }
+    };
+
+    const onMouseLeaveForHover = () => {
+      if (hoveredFeatureIdRef.current !== undefined) {
+        map.setFeatureState(
+          { source: sourceId, id: hoveredFeatureIdRef.current },
+          { hover: false },
+        );
+      }
+      hoveredFeatureIdRef.current = undefined;
+    };
+
+    // Setup hover effects
+    map.on("mouseenter", fillLayerId, onMouseEnter);
+    map.on("mouseleave", fillLayerId, onMouseLeave);
+    map.on("mousemove", fillLayerId, onMouseMove);
+    map.on("mouseleave", fillLayerId, onMouseLeaveForHover);
+
+    return () => {
+      // Remove event listeners
+      map.off("mouseenter", fillLayerId, onMouseEnter);
+      map.off("mouseleave", fillLayerId, onMouseLeave);
+      map.off("mousemove", fillLayerId, onMouseMove);
+      map.off("mouseleave", fillLayerId, onMouseLeaveForHover);
+
+      // Remove layers and source
+      if (map.getLayer(fillLayerId)) {
+        map.removeLayer(fillLayerId);
+      }
+      if (map.getLayer(outlineLayerId)) {
+        map.removeLayer(outlineLayerId);
+      }
+      if (map.getSource(sourceId)) {
+        map.removeSource(sourceId);
+      }
+    };
+  }, [map, data, style, layerId]);
+
+  return null;
+}

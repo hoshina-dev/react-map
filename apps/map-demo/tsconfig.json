@@ -7,7 +7,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@hoshina/react-map": ["../../packages/react-map/src/index.ts"]
     }
   },
   "include": [

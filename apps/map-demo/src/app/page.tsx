@@ -2,8 +2,11 @@
 
 import { Map } from "@hoshina/react-map";
 import { Flex } from "@mantine/core";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
+import { BoundaryLayer } from "@/components/BoundaryLayer";
+import { ClickHandler } from "@/components/ClickHandler";
+import { Marker } from "@/components/Marker";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import {
   clearAdminAreasCache,
@@ -49,21 +52,20 @@ export default function Home() {
     enabled: currentLevel > 0 && !!selectedArea,
   });
 
-  const handleCountryClick = (
-    areaCode: string,
-    areaName: string,
-    _geometry: unknown,
-  ) => {
-    setSelectedArea(areaCode);
-    setSelectedAreaName(areaName);
-    setCurrentLevel(currentLevel + 1);
-  };
+  const handleCountryClick = useCallback(
+    (areaCode: string, areaName: string, _geometry: unknown) => {
+      setSelectedArea(areaCode);
+      setSelectedAreaName(areaName);
+      setCurrentLevel((prev) => prev + 1);
+    },
+    [],
+  );
 
-  const handleZoomOut = () => {
+  const handleZoomOut = useCallback(() => {
     setCurrentLevel((prev) => prev - 1);
     setSelectedArea(null);
     setSelectedAreaName(null);
-  };
+  }, []);
 
   const handleRerender = () => {
     setForceRefresh((prev) => prev + 1);
@@ -83,15 +85,20 @@ export default function Home() {
       ? countriesData?.features?.length || 0
       : childrenData?.features?.length || 0;
 
+  const currentData = currentLevel === 0 ? countriesData : childrenData;
+  const levelStyle = LEVEL_STYLES[currentLevel] || LEVEL_STYLES[0];
+
   return (
     <Flex style={{ width: "100vw", height: "100vh" }}>
-      <Map
-        currentData={currentLevel === 0 ? countriesData : childrenData}
-        currentLevel={currentLevel}
-        levelStyle={LEVEL_STYLES[currentLevel] || LEVEL_STYLES[0]}
-        onGeometryClick={handleCountryClick}
-        onZoomOut={handleZoomOut}
-      />
+      <Map>
+        <Marker />
+        <BoundaryLayer data={currentData} style={levelStyle} />
+        <ClickHandler
+          currentLevel={currentLevel}
+          onGeometryClick={handleCountryClick}
+          onZoomOut={handleZoomOut}
+        />
+      </Map>
 
       <SettingsPanel
         tolerance={tolerance}
