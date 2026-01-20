@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.0] - 2025-01-21
+
+- redesign architecture with high abstraction React Map library
+
 ## [0.3.0] - 2025-01-07
 
 - feat: support level 2

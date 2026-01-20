@@ -25,8 +25,11 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
-
       - name: Lint Strict
         run: pnpm lint-strict
+
+      - name: Type Check
+        run: pnpm type-check
+
+      - name: Build (Only Package)
+        run: pnpm --filter=@hoshina/react-map build
