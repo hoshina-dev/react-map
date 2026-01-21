@@ -15,8 +15,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/hoshina-dev/react-map"
+    "url": "git+https://github.com/hoshina-dev/react-map.git"
   },
+  "license": "MIT",
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
