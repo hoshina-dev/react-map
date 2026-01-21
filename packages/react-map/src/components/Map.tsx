@@ -2,7 +2,7 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { Box } from "@mantine/core";
+import { Box, MantineStyleProp } from "@mantine/core";
 import maplibregl from "maplibre-gl";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
@@ -10,9 +10,10 @@ import { MapProvider } from "../context/MapContext";
 
 interface MapProps {
   children?: ReactNode;
+  style?: MantineStyleProp;
 }
 
-export function Map({ children }: MapProps) {
+export function Map({ children, style }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<maplibregl.Map | null>(null);
 
@@ -61,7 +62,7 @@ export function Map({ children }: MapProps) {
   }, []);
 
   return (
-    <Box style={{ flex: 1, position: "relative" }}>
+    <Box style={{ flex: 1, position: "relative", ...style }}>
       <Box ref={mapContainer} style={{ width: "100%", height: "100%" }} />
       <MapProvider value={{ map }}>{map && children}</MapProvider>
     </Box>

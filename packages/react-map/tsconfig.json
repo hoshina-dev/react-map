@@ -1,8 +1,15 @@
 {
-  "extends": "@repo/config/typescript-react-lib.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist"
+    "isolatedModules": true,
+    "lib": ["es2022", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noUncheckedIndexedAccess": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "jsx": "react-jsx"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
