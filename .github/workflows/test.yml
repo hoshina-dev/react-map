@@ -28,8 +28,8 @@ jobs:
       - name: Lint Strict
         run: pnpm lint-strict
 
-      - name: Type Check
-        run: pnpm type-check
+      - name: Check Types
+        run: pnpm check-types
 
       - name: Build (Only Package)
         run: pnpm --filter=@hoshina/react-map build
