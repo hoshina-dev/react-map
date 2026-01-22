@@ -13,7 +13,12 @@ import maplibregl from "maplibre-gl";
 import { useEffect, useRef } from "react";
 import { createRoot, type Root } from "react-dom/client";
 
-export function Marker() {
+interface MarkerProps {
+  lat: number;
+  lng: number;
+}
+
+export function Marker({ lat, lng }: MarkerProps) {
   const map = useMap();
   const markerRef = useRef<maplibregl.Marker | null>(null);
   const rootRef = useRef<Root | null>(null);
@@ -21,20 +26,22 @@ export function Marker() {
   useEffect(() => {
     if (!map) return;
 
-    // Add a marker at coordinates (0, 0) with a popup
+    // Add a marker at the specified coordinates with a popup
     const popupNode = document.createElement("div");
 
     // Create a React component for the popup content
     const PopupContent = () => (
       <MantineProvider>
         <Stack gap="xs" p="sm">
-          <Title order={4}>Special Location</Title>
-          <Text size="sm">Coordinates: (0, 0)</Text>
-          <Badge color="blue" variant="filled">
-            Null Island
+          <Title order={4}>Custom Marker</Title>
+          <Text size="sm">
+            Coordinates: ({lat.toFixed(4)}, {lng.toFixed(4)})
+          </Text>
+          <Badge color="red" variant="filled">
+            Demo Marker
           </Badge>
           <Text size="xs" c="dimmed">
-            This is the intersection of the Prime Meridian and the Equator
+            This marker position can be controlled via the Settings Panel
           </Text>
           <Button size="xs" variant="light" fullWidth>
             Learn More
@@ -49,9 +56,14 @@ export function Marker() {
     const popup = new maplibregl.Popup({ offset: 25 }).setDOMContent(popupNode);
 
     markerRef.current = new maplibregl.Marker({ color: "#FF0000" })
-      .setLngLat([0, 0])
+      .setLngLat([lng, lat])
       .setPopup(popup)
       .addTo(map);
+
+    // Mark the marker element so ClickHandler can ignore it and set cursor style
+    const markerElement = markerRef.current.getElement();
+    markerElement.setAttribute("data-marker", "true");
+    markerElement.style.cursor = "pointer";
 
     const rootToCleanup = rootRef.current;
 
@@ -62,7 +74,7 @@ export function Marker() {
         rootToCleanup.unmount();
       }, 0);
     };
-  }, [map]);
+  }, [map, lat, lng]);
 
   return null;
 }

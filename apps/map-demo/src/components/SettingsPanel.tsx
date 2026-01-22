@@ -30,6 +30,10 @@ interface SettingsPanelProps {
   maxLevel: number;
   onMaxLevelChange: (maxLevel: number) => void;
   selectedForFinal: boolean;
+  markerLat: number;
+  markerLng: number;
+  onMarkerLatChange: (lat: number) => void;
+  onMarkerLngChange: (lng: number) => void;
 }
 
 export function SettingsPanel({
@@ -45,6 +49,10 @@ export function SettingsPanel({
   maxLevel,
   onMaxLevelChange,
   selectedForFinal,
+  markerLat,
+  markerLng,
+  onMarkerLatChange,
+  onMarkerLngChange,
 }: SettingsPanelProps) {
   return (
     <Paper
@@ -191,6 +199,47 @@ export function SettingsPanel({
                 </Text>
               </Flex>
             ))}
+          </Stack>
+        </Paper>
+
+        <Divider />
+
+        {/* Marker Configuration */}
+        <Paper p="md" withBorder bg="grape.0">
+          <Stack gap="xs">
+            <Title order={5}>Demo Marker Position</Title>
+            <Text size="sm" c="dimmed">
+              Configure the marker coordinates to demonstrate that the Marker
+              component can be controlled as an individual React component.
+            </Text>
+            <NumberInput
+              label="Latitude"
+              description="Range: -90 (South) to 90 (North)"
+              value={markerLat}
+              onChange={(value) =>
+                onMarkerLatChange(typeof value === "number" ? value : 0)
+              }
+              min={-90}
+              max={90}
+              step={0.1}
+              decimalScale={4}
+              allowNegative
+              clampBehavior="strict"
+            />
+            <NumberInput
+              label="Longitude"
+              description="Range: -180 (West) to 180 (East)"
+              value={markerLng}
+              onChange={(value) =>
+                onMarkerLngChange(typeof value === "number" ? value : 0)
+              }
+              min={-180}
+              max={180}
+              step={0.1}
+              decimalScale={4}
+              allowNegative
+              clampBehavior="strict"
+            />
           </Stack>
         </Paper>
 

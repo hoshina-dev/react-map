@@ -31,6 +31,8 @@ export default function Home() {
   const [_, setForceRefresh] = useState(0);
   const [maxLevel, setMaxLevel] = useState(4);
   const [selectedForFinal, setSelectedForFinal] = useState(false);
+  const [markerLat, setMarkerLat] = useState(0);
+  const [markerLng, setMarkerLng] = useState(0);
 
   // Get the current parent area from the hierarchy
   const parentArea = parentHierarchy[currentLevel - 1] || null;
@@ -148,7 +150,7 @@ export default function Home() {
   return (
     <Flex style={{ width: "100vw", height: "100vh" }}>
       <Map>
-        <Marker />
+        <Marker lat={markerLat} lng={markerLng} />
         <BoundaryLayer
           data={currentData}
           style={levelStyle}
@@ -175,6 +177,10 @@ export default function Home() {
         maxLevel={maxLevel}
         onMaxLevelChange={setMaxLevel}
         selectedForFinal={selectedForFinal}
+        markerLat={markerLat}
+        markerLng={markerLng}
+        onMarkerLatChange={setMarkerLat}
+        onMarkerLngChange={setMarkerLng}
       />
     </Flex>
   );

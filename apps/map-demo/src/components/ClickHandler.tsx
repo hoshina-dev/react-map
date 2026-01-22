@@ -30,6 +30,12 @@ export function ClickHandler({
     if (!map) return;
 
     const handleClick = (e: maplibregl.MapLayerMouseEvent) => {
+      // Ignore clicks on markers
+      const target = e.originalEvent.target as HTMLElement;
+      if (target.closest('[data-marker="true"]')) {
+        return;
+      }
+
       if (!e.features || e.features.length === 0) return;
 
       const feature = e.features[0];
